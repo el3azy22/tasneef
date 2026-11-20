@@ -268,10 +268,6 @@ h1{margin:0;font-family:var(--display);font-size:clamp(15px,5.6vw,24px);font-wei
       </div>
     </div>
     <div class="prog">
-      <button class="btn pub" id="shotBtn" type="button">
-        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3L10 14"></path><path d="M21 3l-7 18-4-7-7-4z"></path></svg>
-        <span>انشر تصنيفك</span>
-      </button>
       <div class="bar"><i id="barFill"></i></div><b id="count" dir="ltr">0 / 69</b></div>
   </header>
 
@@ -328,7 +324,7 @@ h1{margin:0;font-family:var(--display);font-size:clamp(15px,5.6vw,24px);font-wei
   <ol class="steps">
     <li><i>1</i><span>اسحب الكرت لفوق واختار تصنيف كل مغرد.</span></li>
     <li><i>2</i><span>غيّرت رأيك؟ اسحب الكرت من تصنيفه إلى تصنيف ثاني، أو رجّعه للرزمة.</span></li>
-    <li><i>3</i><span>انشر تصنيفك في أي وقت من زر «انشر تصنيفك»، حتى لو ما كملت الـ69.</span></li>
+    <li><i>3</i><span>انشر تصنيفك في أي وقت من زر «اعتمد وانشر» تحت الكروت، حتى لو ما كملت الـ69.</span></li>
   </ol>
   <button class="btn gold big" id="startBtn" type="button">ابدأ التصنيف</button>
   <a class="maker" href="https://x.com/el3azy22" target="_blank" rel="noopener">
@@ -792,7 +788,6 @@ function openShot(){
     Promise.all([document.fonts.load("700 40px 'El Messiri'"),document.fonts.load("700 24px 'Tajawal'"),document.fonts.load("500 24px 'Tajawal'"),document.fonts.load("900 46px 'Cinzel'")]).then(go,go);
   } else go();
 }
-$("shotBtn").addEventListener("click",openShot);
 $("doneBtn").addEventListener("click",openShot);
 $("pubNow").addEventListener("click",openShot);
 $("closeBtn").addEventListener("click",function(){closeSheet(sheet)});
