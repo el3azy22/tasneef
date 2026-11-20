@@ -533,7 +533,13 @@ $("pickClose").addEventListener("click",function(){closeSheet($("picker"))});
 
 /* drag: the card follows the finger, shrinks as it rises, and takes the rarity of the rail under it */
 var dragging=false,sx=0,sy=0,hot=null,lastY=0,lastX=0,scrollRaf=0;
+/* the deck zone: anything from the top of the cards down is "back to the deck", never a tier hidden behind it */
+function deckTop(){
+  var d=document.querySelector("#dock .deck").getBoundingClientRect();
+  return (d.height?d.top:dock.getBoundingClientRect().top+24)-10;
+}
 function railAt(y){
+  if(y>=deckTop()) return null;
   for(var k=0;k<TIERS.length;k++){var r=railEls[TIERS[k].id].getBoundingClientRect();if(y>=r.top-3&&y<=r.bottom+3) return TIERS[k].id;}
   return null;
 }
@@ -594,8 +600,7 @@ function miniDrag(node,i,tid){
   function loop(){
     if(!active) return;
     if(my<70) window.scrollBy(0,-10);
-    var dt=dock.getBoundingClientRect().top+24;
-    setTarget(my>=dt&&S.queue.length?"dock":railAt(my));
+    setTarget(my>=deckTop()&&S.queue.length?"dock":railAt(my));
     raf=requestAnimationFrame(loop);
   }
   function finish(drop){
