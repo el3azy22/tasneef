@@ -143,6 +143,20 @@ h1{margin:0;font-family:var(--display);font-size:clamp(15px,5.6vw,24px);font-wei
 .tray::-webkit-scrollbar{display:none}
 .tray:empty::before{content:"اسحب الكرت هنا";font-size:12px;color:#7F94A1}
 
+/* the board: every tier at once, shown while a card is being dragged */
+.board{position:fixed;z-index:15;top:0;left:50%;width:100%;max-width:520px;transform:translate(-50%,-110%);
+  display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:calc(10px + env(safe-area-inset-top)) 12px 12px;
+  background:rgba(7,29,43,.97);border-bottom:2px solid var(--gold);border-radius:0 0 18px 18px;box-shadow:0 18px 34px -12px rgba(0,0,0,.85);
+  transition:transform .18s ease-out;pointer-events:none}
+.board.on{transform:translate(-50%,0)}
+.cell{height:60px;border-radius:12px;display:flex;align-items:center;justify-content:center;text-align:center;padding:4px;color:var(--ink);
+  font-family:var(--display);font-size:14.5px;font-weight:700;line-height:1.2;
+  background:linear-gradient(150deg,var(--b) 0%,var(--a) 46%,var(--a) 54%,var(--b) 100%);
+  box-shadow:inset 0 0 0 1.5px rgba(255,245,229,.38),inset 0 10px 14px -10px rgba(255,255,255,.55),inset 0 -12px 14px -10px rgba(0,0,0,.45);
+  transition:transform .12s,box-shadow .12s}
+.cell:not(.t-hr):not(.t-ls){text-shadow:0 1px 2px rgba(0,0,0,.65)}
+.cell.hot{transform:scale(1.07);box-shadow:0 0 0 3px #fff,0 0 22px 2px var(--a),inset 0 10px 14px -10px rgba(255,255,255,.55)}
+
 /* the card */
 :where(.card){--a:#2B566E;--b:#0F2C3D;--ink:#FFF5E5;--holo:.34;--hx:50%;--hy:50%;--ang:135deg}
 .card{position:relative;isolation:isolate;display:flex;flex-direction:column;border-radius:12px;padding:6px;gap:5px;
@@ -181,10 +195,10 @@ h1{margin:0;font-family:var(--display);font-size:clamp(15px,5.6vw,24px);font-wei
 .card.mini.pop{animation:pop .45s cubic-bezier(.2,1.6,.4,1)}
 .card.mini{touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;cursor:grab}
 .card.mini.lifted{opacity:.28}
-.card.ghost{position:fixed;left:0;top:0;width:104px;height:144px;z-index:80;pointer-events:none;margin:-100px 0 0 -52px;
+.card.ghost{position:fixed;left:0;top:0;width:84px;height:116px;z-index:80;pointer-events:none;margin:12px 0 0 -42px;
   box-shadow:0 18px 34px -10px rgba(0,0,0,.85);will-change:transform}
-.card.ghost .art b{font-size:44px}
-.card.ghost .hd{font-size:11px}
+.card.ghost .art b{font-size:36px}
+.card.ghost .hd{font-size:10px}
 .dock.hot .deck{outline:2px dashed var(--gold-hi);outline-offset:9px;border-radius:18px}
 
 /* card back, used by the deck and the pack */
@@ -246,7 +260,7 @@ h1{margin:0;font-family:var(--display);font-size:clamp(15px,5.6vw,24px);font-wei
 @media (prefers-reduced-motion:reduce){
   .card::before,.plate::before,.plate::after,.bg::after,.btn.pub,.btn.pub::after{animation:none}
   .card.mini.pop,#live.deal,.rail.flash{animation:none}
-  .rail,#live.back-home,.btn{transition:none}
+  .rail,#live.back-home,.btn,.board,.cell{transition:none}
 }
 </style>
 </head>
@@ -268,6 +282,8 @@ h1{margin:0;font-family:var(--display);font-size:clamp(15px,5.6vw,24px);font-wei
       </button>
       <div class="bar"><i id="barFill"></i></div><b id="count" dir="ltr">0 / 69</b></div>
   </header>
+
+  <div class="board" id="board" aria-hidden="true"></div>
 
   <main class="rails" id="rails" aria-label="التصنيفات"></main>
 
@@ -319,7 +335,7 @@ h1{margin:0;font-family:var(--display);font-size:clamp(15px,5.6vw,24px);font-wei
   <h2 id="introT">تصنيف مغردين الكرة الإماراتية</h2>
   <p>69 مغرد، وتصنيفهم بيدك.</p>
   <ol class="steps">
-    <li><i>1</i><span>اسحب الكرت لفوق واختار تصنيف كل مغرد.</span></li>
+    <li><i>1</i><span>اسحب الكرت لفوق، وبتطلع لك كل التصنيفات. اختار تصنيف كل مغرد.</span></li>
     <li><i>2</i><span>غيّرت رأيك؟ اسحب الكرت من تصنيفه إلى تصنيف ثاني، أو رجّعه للرزمة.</span></li>
     <li><i>3</i><span>بعد ما تخلص انشر تصنيفك عن طريق زر «انشر تصنيفك» في الأعلى.</span></li>
   </ol>
@@ -412,6 +428,19 @@ TIERS.forEach(function(t){
   railEls[t.id]=rail;trayEls[t.id]=tray;ctEls[t.id]=ct;
 });
 
+var board=$("board"),cellEls={};
+TIERS.forEach(function(t){var c=el("div","cell t-"+t.id,t.name);board.appendChild(c);cellEls[t.id]=c;});
+function showBoard(on){board.classList.toggle("on",!!on);}
+function dropAt(x,y){
+  if(board.classList.contains("on")){
+    var br=board.getBoundingClientRect();
+    if(y<=br.bottom){
+      for(var k=0;k<TIERS.length;k++){var r=cellEls[TIERS[k].id].getBoundingClientRect();if(x>=r.left-3&&x<=r.right+3&&y>=r.top-3&&y<=r.bottom+3) return TIERS[k].id;}
+      return null;
+    }
+  }
+  return railAt(y);
+}
 function artFor(i){
   var h=HANDLES[i],art=el("div","art");
   art.style.setProperty("--ang",(25+seed(h)%130)+"deg");
@@ -520,28 +549,27 @@ $("pickBtn").addEventListener("click",function(){
 $("pickClose").addEventListener("click",function(){closeSheet($("picker"))});
 
 /* drag: the card follows the finger, shrinks as it rises, and takes the rarity of the rail under it */
-var dragging=false,sx=0,sy=0,hot=null,lastY=0,scrollRaf=0;
+var dragging=false,sx=0,sy=0,hot=null,lastY=0,lastX=0,scrollRaf=0;
 function railAt(y){
   for(var k=0;k<TIERS.length;k++){var r=railEls[TIERS[k].id].getBoundingClientRect();if(y>=r.top-3&&y<=r.bottom+3) return TIERS[k].id;}
   return null;
 }
 function setHot(tid){
   if(tid===hot) return;
-  if(hot) railEls[hot].classList.remove("hot");
-  hot=tid;if(hot){railEls[hot].classList.add("hot");buzz(5);}
+  if(hot){railEls[hot].classList.remove("hot");cellEls[hot].classList.remove("hot");}
+  hot=tid;if(hot){railEls[hot].classList.add("hot");cellEls[hot].classList.add("hot");buzz(5);}
   setLiveTier(hot);
 }
 function autoScroll(){
   if(!dragging) return;
   var vh=window.innerHeight;
-  if(lastY<70) window.scrollBy(0,-10);
-  else if(lastY>vh-40) window.scrollBy(0,10);
-  setHot(railAt(lastY));
+  if(lastY>vh-40) window.scrollBy(0,10);
+  setHot(dropAt(lastX,lastY));
   scrollRaf=requestAnimationFrame(autoScroll);
 }
 live.addEventListener("pointerdown",function(e){
   if(!S.queue.length||dragging) return;
-  dragging=true;sx=e.clientX;sy=e.clientY;lastY=e.clientY;
+  dragging=true;sx=e.clientX;sy=e.clientY;lastY=e.clientY;lastX=e.clientX;
   live.classList.remove("back-home","deal");live.classList.add("drag");
   try{live.setPointerCapture(e.pointerId)}catch(err){}
   scrollRaf=requestAnimationFrame(autoScroll);
@@ -549,9 +577,10 @@ live.addEventListener("pointerdown",function(e){
 });
 live.addEventListener("pointermove",function(e){
   if(!dragging) return;
-  var dx=e.clientX-sx,dy=e.clientY-sy;lastY=e.clientY;
-  var lift=Math.min(1,Math.abs(dy)/220),sc=1-lift*.36;
-  live.style.transform="translate("+dx+"px,"+dy+"px) rotate("+(dx/14)+"deg) scale("+sc+")";
+  var dx=e.clientX-sx,dy=e.clientY-sy;lastY=e.clientY;lastX=e.clientX;
+  if(Math.abs(dx)+Math.abs(dy)>5) showBoard(true);
+  var lift=Math.min(1,Math.abs(dy)/220),sc=1-lift*.45;
+  live.style.transform="translate("+dx+"px,"+(dy+lift*72)+"px) rotate("+(dx/14)+"deg) scale("+sc+")";
   live.style.setProperty("--hx",(50+dx/3)+"%");
   live.style.setProperty("--hy",(50+dy/5)+"%");
 });
@@ -559,8 +588,9 @@ function endDrag(e,cancel){
   if(!dragging) return;
   dragging=false;cancelAnimationFrame(scrollRaf);
   live.classList.remove("drag");
-  var target=cancel?null:railAt(e.clientY);
-  if(hot) railEls[hot].classList.remove("hot");hot=null;
+  var target=cancel?null:dropAt(e.clientX,e.clientY);
+  if(hot){railEls[hot].classList.remove("hot");cellEls[hot].classList.remove("hot");}hot=null;
+  showBoard(false);
   if(target){place(target);}
   else{setLiveTier(null);live.classList.add("back-home");live.style.transform="";}
 }
@@ -569,27 +599,25 @@ live.addEventListener("pointercancel",function(e){endDrag(e,true)});
 /* dragging a placed card: up or down to another rail moves it, down onto the deck returns it to the hand */
 var skipClick=false;
 function miniDrag(node,i,tid){
-  var on=false,active=false,x0=0,y0=0,ghost=null,target=null,my=0,raf=0;
+  var on=false,active=false,x0=0,y0=0,ghost=null,target=null,my=0,mx=0,raf=0;
   function setTarget(t){
     if(t===target) return;
-    if(target&&target!=="dock") railEls[target].classList.remove("hot");
+    if(target&&target!=="dock"){railEls[target].classList.remove("hot");cellEls[target].classList.remove("hot");}
     if(target==="dock") dock.classList.remove("hot");
     target=t;
     if(target==="dock"){dock.classList.add("hot");buzz(5);}
-    else if(target){railEls[target].classList.add("hot");buzz(5);}
+    else if(target){railEls[target].classList.add("hot");cellEls[target].classList.add("hot");buzz(5);}
     if(ghost) ghost.className="card ghost"+(target&&target!=="dock"?" t-"+target:(target==="dock"?"":" t-"+tid));
   }
   function loop(){
     if(!active) return;
-    var vh=window.innerHeight;
-    if(my<70) window.scrollBy(0,-10);
     var dt=dock.getBoundingClientRect().top+24;
-    setTarget(my>=dt&&S.queue.length?"dock":railAt(my));
+    setTarget(my>=dt&&S.queue.length?"dock":dropAt(mx,my));
     raf=requestAnimationFrame(loop);
   }
   function finish(drop){
     on=false;cancelAnimationFrame(raf);
-    var t=target;setTarget(null);
+    var t=target;setTarget(null);showBoard(false);
     node.classList.remove("lifted");
     if(ghost){ghost.remove();ghost=null;}
     if(!active) return;
@@ -604,16 +632,16 @@ function miniDrag(node,i,tid){
   }
   node.addEventListener("pointerdown",function(e){
     if(dragging) return;
-    on=true;active=false;x0=e.clientX;y0=e.clientY;my=e.clientY;
+    on=true;active=false;x0=e.clientX;y0=e.clientY;my=e.clientY;mx=e.clientX;
     try{node.setPointerCapture(e.pointerId)}catch(err){}
     e.preventDefault();
   });
   node.addEventListener("pointermove",function(e){
     if(!on) return;
-    var dx=e.clientX-x0,dy=e.clientY-y0;my=e.clientY;
+    var dx=e.clientX-x0,dy=e.clientY-y0;my=e.clientY;mx=e.clientX;
     if(!active){
       if(Math.abs(dx)+Math.abs(dy)<5) return;
-      active=true;node.classList.add("lifted");
+      active=true;node.classList.add("lifted");showBoard(true);
       ghost=el("div","card ghost t-"+tid);
       ghost.appendChild(artFor(i));ghost.appendChild(el("div","hd","@"+HANDLES[i]));
       document.body.appendChild(ghost);
