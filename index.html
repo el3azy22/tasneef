@@ -143,20 +143,6 @@ h1{margin:0;font-family:var(--display);font-size:clamp(15px,5.6vw,24px);font-wei
 .tray::-webkit-scrollbar{display:none}
 .tray:empty::before{content:"اسحب الكرت هنا";font-size:12px;color:#7F94A1}
 
-/* the board: every tier at once, shown while a card is being dragged */
-.board{position:fixed;z-index:15;top:0;left:50%;width:100%;max-width:520px;transform:translate(-50%,-110%);
-  display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:calc(10px + env(safe-area-inset-top)) 12px 12px;
-  background:rgba(7,29,43,.97);border-bottom:2px solid var(--gold);border-radius:0 0 18px 18px;box-shadow:0 18px 34px -12px rgba(0,0,0,.85);
-  transition:transform .18s ease-out;pointer-events:none}
-.board.on{transform:translate(-50%,0)}
-.cell{height:60px;border-radius:12px;display:flex;align-items:center;justify-content:center;text-align:center;padding:4px;color:var(--ink);
-  font-family:var(--display);font-size:14.5px;font-weight:700;line-height:1.2;
-  background:linear-gradient(150deg,var(--b) 0%,var(--a) 46%,var(--a) 54%,var(--b) 100%);
-  box-shadow:inset 0 0 0 1.5px rgba(255,245,229,.38),inset 0 10px 14px -10px rgba(255,255,255,.55),inset 0 -12px 14px -10px rgba(0,0,0,.45);
-  transition:transform .12s,box-shadow .12s}
-.cell:not(.t-hr):not(.t-ls){text-shadow:0 1px 2px rgba(0,0,0,.65)}
-.cell.hot{transform:scale(1.07);box-shadow:0 0 0 3px #fff,0 0 22px 2px var(--a),inset 0 10px 14px -10px rgba(255,255,255,.55)}
-
 /* the card */
 :where(.card){--a:#2B566E;--b:#0F2C3D;--ink:#FFF5E5;--holo:.34;--hx:50%;--hy:50%;--ang:135deg}
 .card{position:relative;isolation:isolate;display:flex;flex-direction:column;border-radius:12px;padding:6px;gap:5px;
@@ -185,7 +171,9 @@ h1{margin:0;font-family:var(--display);font-size:clamp(15px,5.6vw,24px);font-wei
 
 .card.big{width:128px;height:178px}
 .card.big .art b{font-size:60px}
-.card.big .hd{font-size:12px}
+.card .pn{font-family:var(--display);font-size:13.5px;font-weight:700;line-height:1.25;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card.big{gap:3px}
+.card.big .hd{font-size:11px;opacity:.92}
 .card.mini{all:unset;box-sizing:border-box;cursor:pointer;flex:none;width:52px;height:60px;padding:3px;gap:2px;border-radius:8px;
   position:relative;isolation:isolate;display:flex;flex-direction:column;overflow:hidden;
   background:linear-gradient(155deg,var(--a),var(--b));color:var(--ink);border:1.5px solid color-mix(in srgb,var(--a) 55%,#fff)}
@@ -195,10 +183,10 @@ h1{margin:0;font-family:var(--display);font-size:clamp(15px,5.6vw,24px);font-wei
 .card.mini.pop{animation:pop .45s cubic-bezier(.2,1.6,.4,1)}
 .card.mini{touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;cursor:grab}
 .card.mini.lifted{opacity:.28}
-.card.ghost{position:fixed;left:0;top:0;width:84px;height:116px;z-index:80;pointer-events:none;margin:12px 0 0 -42px;
+.card.ghost{position:fixed;left:0;top:0;width:104px;height:144px;z-index:80;pointer-events:none;margin:-100px 0 0 -52px;
   box-shadow:0 18px 34px -10px rgba(0,0,0,.85);will-change:transform}
-.card.ghost .art b{font-size:36px}
-.card.ghost .hd{font-size:10px}
+.card.ghost .art b{font-size:44px}
+.card.ghost .hd{font-size:11px}
 .dock.hot .deck{outline:2px dashed var(--gold-hi);outline-offset:9px;border-radius:18px}
 
 /* card back, used by the deck and the pack */
@@ -218,6 +206,8 @@ h1{margin:0;font-family:var(--display);font-size:clamp(15px,5.6vw,24px);font-wei
 .hand{display:flex;align-items:center;justify-content:center;gap:18px;width:100%}
 .deck{position:relative;width:128px;height:178px;flex:none}
 .deck .cback{position:absolute;inset:0}
+.deck .peek{position:absolute;inset:0;pointer-events:none;filter:brightness(.78)}
+.deck .peek::before,.deck .peek::after{animation:none;opacity:.12}
 .deck .b1{transform:translate(-8px,5px) rotate(-6deg)}
 .deck .b2{transform:translate(8px,4px) rotate(5deg)}
 #live{position:absolute;inset:0;touch-action:none;cursor:grab;will-change:transform;box-shadow:0 14px 30px -10px rgba(0,0,0,.75)}
@@ -248,7 +238,7 @@ h1{margin:0;font-family:var(--display);font-size:clamp(15px,5.6vw,24px);font-wei
 .steps li{display:flex;align-items:center;gap:10px;font-size:14px;line-height:1.5;background:var(--navy-2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
 .steps li i{flex:none;width:26px;height:26px;border-radius:50%;background:var(--foil);color:#071D2B;font-style:normal;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
 .plist{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;width:100%;max-width:420px}
-.plist .btn{direction:ltr;font-size:12px;font-weight:500;min-height:44px;padding:0 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.plist .btn{unicode-bidi:plaintext;text-align:center;font-size:12px;font-weight:500;min-height:44px;padding:0 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
 
 @keyframes holo{from{background-position:0% 0%}to{background-position:100% 100%}}
 @keyframes sweep{from{background-position:130% 0}to{background-position:-130% 0}}
@@ -260,7 +250,7 @@ h1{margin:0;font-family:var(--display);font-size:clamp(15px,5.6vw,24px);font-wei
 @media (prefers-reduced-motion:reduce){
   .card::before,.plate::before,.plate::after,.bg::after,.btn.pub,.btn.pub::after{animation:none}
   .card.mini.pop,#live.deal,.rail.flash{animation:none}
-  .rail,#live.back-home,.btn,.board,.cell{transition:none}
+  .rail,#live.back-home,.btn{transition:none}
 }
 </style>
 </head>
@@ -283,8 +273,6 @@ h1{margin:0;font-family:var(--display);font-size:clamp(15px,5.6vw,24px);font-wei
       <div class="bar"><i id="barFill"></i></div><b id="count" dir="ltr">0 / 69</b></div>
   </header>
 
-  <div class="board" id="board" aria-hidden="true"></div>
-
   <main class="rails" id="rails" aria-label="التصنيفات"></main>
 
   <a class="maker" href="https://x.com/el3azy22" target="_blank" rel="noopener">
@@ -300,8 +288,8 @@ h1{margin:0;font-family:var(--display);font-size:clamp(15px,5.6vw,24px);font-wei
         تراجع
       </button>
       <div class="deck">
-        <div class="cback b1" aria-hidden="true"><i><img src="logo.png" alt=""></i></div>
-        <div class="cback b2" aria-hidden="true"><i><img src="logo.png" alt=""></i></div>
+        <div class="card big peek b1" id="peek2" aria-hidden="true"></div>
+        <div class="card big peek b2" id="peek1" aria-hidden="true"></div>
         <div class="card big" id="live" tabindex="0" role="img"></div>
       </div>
       <button class="btn sq" id="skipBtn" type="button">
@@ -328,14 +316,14 @@ h1{margin:0;font-family:var(--display);font-size:clamp(15px,5.6vw,24px);font-wei
 <!-- intro / how to play -->
 <div class="sheet" id="intro" role="dialog" aria-modal="true" aria-labelledby="introT">
   <div class="deck demo" aria-hidden="true">
-    <div class="cback b1"><i><img src="logo.png" alt=""></i></div>
-    <div class="cback b2"><i><img src="logo.png" alt=""></i></div>
+    <div class="cback b1"></div>
+    <div class="cback b2"></div>
     <div class="card big"><div class="tag"><span>بدون تصنيف</span><span>0/69</span></div><div class="art xmark"><b>X</b></div><div class="hd">69 مغرد</div></div>
   </div>
   <h2 id="introT">تصنيف مغردين الكرة الإماراتية</h2>
   <p>69 مغرد، وتصنيفهم بيدك.</p>
   <ol class="steps">
-    <li><i>1</i><span>اسحب الكرت لفوق، وبتطلع لك كل التصنيفات. اختار تصنيف كل مغرد.</span></li>
+    <li><i>1</i><span>اسحب الكرت لفوق واختار تصنيف كل مغرد.</span></li>
     <li><i>2</i><span>غيّرت رأيك؟ اسحب الكرت من تصنيفه إلى تصنيف ثاني، أو رجّعه للرزمة.</span></li>
     <li><i>3</i><span>بعد ما تخلص انشر تصنيفك عن طريق زر «انشر تصنيفك» في الأعلى.</span></li>
   </ol>
@@ -381,6 +369,7 @@ var TIERS=[
 var ON_SITE=/(^|\.)el3azy\.com$/.test(location.hostname);
 var PAGE_URL=ON_SITE?"https://el3azy.com/tasneef/":"https://claude.ai/artifact/GQu4rmFSMs9PpYb4CiaR1p";
 var HANDLES=["saifcaio","SaeedSaif_","el3azy22","Pochitteno","_hazzza3","vx3in","s_alktebi","y0uxf","bujsem","im7v7","bn_rashed88","Sl6Here","SaIem","Pablo05000","iijmool","_zico9","Adel_AlBastaki","aalhosani662211","_Mbfayez","KhaledAlhosani","msmsalkhyeli","pintooq1763","kaifi212","suhailsalem21","Xerox9715","llX7Mll","AliAli23826516","_alshamsi84","alrousi86","Sharjawi_83","Sharjawy_66","IVl7MD_","zaimuae6","Royal_7amad","jazrawi1987","walhan_ndalshba","_humaidA","HS3eed2","_oxox39","_Abdullah_309","AM__ALHOSANI","___Sharjawy","_mv1z","EscaAE","kh_vv7","yousifaz83","bo3mar1942","SultanKayed","_iRashid_","rr_23a","Zaayd1971","sultan_dalwan","bu_alyazia82","iFahod10","OMS_32_","10Mayoood","Fahadalhosanii","a_binkamal","IVl0HD","66kba","Soul_Alain","laazori","_1saeed","_a39o","KFA7I","binmadhi9955","swaslawi","UAExB3","Dr_Humd"];
+var NAMES={"saifcaio": "سيف", "SaeedSaif_": "سعيد سيف", "el3azy22": "العازي", "Pochitteno": "سيف", "_hazzza3": "هزاع العمري", "vx3in": "هزاع", "s_alktebi": "سالم الكتبي", "y0uxf": "يوسف", "bujsem": "بوجسيم", "im7v7": "بو مبارك", "bn_rashed88": "عبدالله بن كلبان", "Sl6Here": "سلط", "SaIem": "سويلم", "Pablo05000": "بابلو", "iijmool": "جمال", "_zico9": "حمدان", "Adel_AlBastaki": "عادل", "aalhosani662211": "عبدالله الحوسني", "_Mbfayez": "بوفايز", "KhaledAlhosani": "خالد الحوسني", "msmsalkhyeli": "مبارك بن سعيد الخييلي", "pintooq1763": "بن طوق", "kaifi212": "ALNUAIMI KHALED", "suhailsalem21": "Suhail 40", "Xerox9715": "Sultan SBG", "llX7Mll": "مبارك", "AliAli23826516": "بوحمد", "_alshamsi84": "الشامسي", "alrousi86": "احمد الروسي", "Sharjawi_83": "احمد البلوشي", "Sharjawy_66": "محمد", "IVl7MD_": "محمد", "zaimuae6": "Mohammed", "Royal_7amad": "حمد الرئيسي", "jazrawi1987": "حمد النعيمي", "walhan_ndalshba": "ولهان ند الشبا", "_humaidA": "م.حميد الطاهر", "HS3eed2": "حمدسعيدالعامري", "_oxox39": "Abdulla", "_Abdullah_309": "عبدالله", "AM__ALHOSANI": "Abdullah AlHosani", "___Sharjawy": "سليمان", "_mv1z": "ZAYED", "EscaAE": "Ali", "kh_vv7": "Khaled Alshebli", "yousifaz83": "Yousif al bloushi", "bo3mar1942": "بوعمر", "SultanKayed": "sultan eats", "_iRashid_": "راشد", "rr_23a": "راشد المرزوقي", "Zaayd1971": "بو زايد", "sultan_dalwan": "سلطان الكتبي", "bu_alyazia82": "بواليازيه | بطل الرباعية", "10Mayoood": "Majid Aman", "Fahadalhosanii": "م. فهد الحوسني", "a_binkamal": "عبدالله بن كمال", "IVl0HD": "محمد", "66kba": "خليفه", "Soul_Alain": "سعيد البلوشي", "laazori": "سعيد الكعبي", "_1saeed": "سعيد الشامسي", "_a39o": "Adnaan", "binmadhi9955": "بن ماضي", "swaslawi": "سالم المنّاعي", "UAExB3": "Bu Eissa | Old School", "Dr_Humd": "حميد"};
 /* photos the owner supplies later: {"handle":"photos/handle.jpg"} */
 var PHOTOS={};
 ["10Mayoood", "66kba", "AM__ALHOSANI", "Adel_AlBastaki", "AliAli23826516", "Dr_Humd", "EscaAE", "Fahadalhosanii", "HS3eed2", "IVl0HD", "IVl7MD_", "KFA7I", "KhaledAlhosani", "OMS_32_", "Pablo05000", "Pochitteno", "Royal_7amad", "SaIem", "SaeedSaif_", "Sharjawi_83", "Sharjawy_66", "Sl6Here", "Soul_Alain", "SultanKayed", "UAExB3", "Xerox9715", "Zaayd1971", "_1saeed", "_Abdullah_309", "_Mbfayez", "___Sharjawy", "_a39o", "_alshamsi84", "_hazzza3", "_humaidA", "_iRashid_", "_mv1z", "_oxox39", "_zico9", "a_binkamal", "aalhosani662211", "alrousi86", "binmadhi9955", "bn_rashed88", "bo3mar1942", "bu_alyazia82", "bujsem", "el3azy22", "iFahod10", "iijmool", "im7v7", "jazrawi1987", "kaifi212", "kh_vv7", "laazori", "llX7Mll", "msmsalkhyeli", "pintooq1763", "rr_23a", "s_alktebi", "saifcaio", "suhailsalem21", "sultan_dalwan", "swaslawi", "vx3in", "walhan_ndalshba", "y0uxf", "yousifaz83", "zaimuae6"].forEach(function(h){PHOTOS[h]="photos/"+h+".jpg"});
@@ -428,19 +417,6 @@ TIERS.forEach(function(t){
   railEls[t.id]=rail;trayEls[t.id]=tray;ctEls[t.id]=ct;
 });
 
-var board=$("board"),cellEls={};
-TIERS.forEach(function(t){var c=el("div","cell t-"+t.id,t.name);board.appendChild(c);cellEls[t.id]=c;});
-function showBoard(on){board.classList.toggle("on",!!on);}
-function dropAt(x,y){
-  if(board.classList.contains("on")){
-    var br=board.getBoundingClientRect();
-    if(y<=br.bottom){
-      for(var k=0;k<TIERS.length;k++){var r=cellEls[TIERS[k].id].getBoundingClientRect();if(x>=r.left-3&&x<=r.right+3&&y>=r.top-3&&y<=r.bottom+3) return TIERS[k].id;}
-      return null;
-    }
-  }
-  return railAt(y);
-}
 function artFor(i){
   var h=HANDLES[i],art=el("div","art");
   art.style.setProperty("--ang",(25+seed(h)%130)+"deg");
@@ -454,7 +430,10 @@ function fillCard(node,i){
   var l=el("span",null,"بدون تصنيف");
   var r=el("span",null,num(i));
   tag.appendChild(l);tag.appendChild(r);
-  node.appendChild(tag);node.appendChild(artFor(i));node.appendChild(el("div","hd","@"+HANDLES[i]));
+  node.appendChild(tag);node.appendChild(artFor(i));
+  var nm=NAMES[HANDLES[i]];
+  if(nm){var pn=el("div","pn",nm);pn.dir="auto";node.appendChild(pn);}
+  node.appendChild(el("div","hd","@"+HANDLES[i]));
 }
 function miniCard(i,tid,pop){
   var b=el("button","card mini t-"+tid+(pop?" pop":""));b.type="button";
@@ -482,8 +461,12 @@ function render(popIndex){
   $("left").textContent=S.queue.length>1?("باقي "+S.queue.length+" كرت في الرزمة"):(S.queue.length===1?"آخر كرت":"");
   undoBtn.disabled=!S.log.length;
   dock.classList.toggle("finished",!S.queue.length);
+  if(!S.queue.length){$("peek1").hidden=true;$("peek2").hidden=true;}
   if(S.queue.length){
     fillCard(live,S.queue[0]);
+    [["peek1",1],["peek2",2]].forEach(function(pk){
+      var n=$(pk[0]);if(S.queue.length>pk[1]){n.hidden=false;fillCard(n,S.queue[pk[1]]);}else{n.hidden=true;n.textContent="";}
+    });
     live.className="card big";
     live.setAttribute("aria-label","الكرت الحالي: @"+HANDLES[S.queue[0]]);
     live.style.transform="";
@@ -537,7 +520,7 @@ $("pickBtn").addEventListener("click",function(){
   var list=$("plist");list.textContent="";
   S.queue.slice().sort(function(a,b){return HANDLES[a].replace(/^_+/,"").toLowerCase()<HANDLES[b].replace(/^_+/,"").toLowerCase()?-1:1})
    .forEach(function(i){
-    var b=el("button","btn","@"+HANDLES[i]);b.type="button";
+    var b=el("button","btn",(NAMES[HANDLES[i]]?"\u2068"+NAMES[HANDLES[i]]+"\u2069 · ":"")+at(i));b.type="button";b.dir="auto";
     b.addEventListener("click",function(){
       var k=S.queue.indexOf(i);if(k>-1){S.queue.splice(k,1);S.queue.unshift(i);}
       closeSheet($("picker"));hint.textContent="هذا كرت "+at(i)+"، اختار تصنيفه.";render();deal();
@@ -556,15 +539,16 @@ function railAt(y){
 }
 function setHot(tid){
   if(tid===hot) return;
-  if(hot){railEls[hot].classList.remove("hot");cellEls[hot].classList.remove("hot");}
-  hot=tid;if(hot){railEls[hot].classList.add("hot");cellEls[hot].classList.add("hot");buzz(5);}
+  if(hot) railEls[hot].classList.remove("hot");
+  hot=tid;if(hot){railEls[hot].classList.add("hot");buzz(5);}
   setLiveTier(hot);
 }
 function autoScroll(){
   if(!dragging) return;
   var vh=window.innerHeight;
-  if(lastY>vh-40) window.scrollBy(0,10);
-  setHot(dropAt(lastX,lastY));
+  if(lastY<70) window.scrollBy(0,-10);
+  else if(lastY>vh-40) window.scrollBy(0,10);
+  setHot(railAt(lastY));
   scrollRaf=requestAnimationFrame(autoScroll);
 }
 live.addEventListener("pointerdown",function(e){
@@ -578,9 +562,8 @@ live.addEventListener("pointerdown",function(e){
 live.addEventListener("pointermove",function(e){
   if(!dragging) return;
   var dx=e.clientX-sx,dy=e.clientY-sy;lastY=e.clientY;lastX=e.clientX;
-  if(Math.abs(dx)+Math.abs(dy)>5) showBoard(true);
-  var lift=Math.min(1,Math.abs(dy)/220),sc=1-lift*.45;
-  live.style.transform="translate("+dx+"px,"+(dy+lift*72)+"px) rotate("+(dx/14)+"deg) scale("+sc+")";
+  var lift=Math.min(1,Math.abs(dy)/220),sc=1-lift*.36;
+  live.style.transform="translate("+dx+"px,"+dy+"px) rotate("+(dx/14)+"deg) scale("+sc+")";
   live.style.setProperty("--hx",(50+dx/3)+"%");
   live.style.setProperty("--hy",(50+dy/5)+"%");
 });
@@ -588,9 +571,8 @@ function endDrag(e,cancel){
   if(!dragging) return;
   dragging=false;cancelAnimationFrame(scrollRaf);
   live.classList.remove("drag");
-  var target=cancel?null:dropAt(e.clientX,e.clientY);
-  if(hot){railEls[hot].classList.remove("hot");cellEls[hot].classList.remove("hot");}hot=null;
-  showBoard(false);
+  var target=cancel?null:railAt(e.clientY);
+  if(hot) railEls[hot].classList.remove("hot");hot=null;
   if(target){place(target);}
   else{setLiveTier(null);live.classList.add("back-home");live.style.transform="";}
 }
@@ -602,22 +584,23 @@ function miniDrag(node,i,tid){
   var on=false,active=false,x0=0,y0=0,ghost=null,target=null,my=0,mx=0,raf=0;
   function setTarget(t){
     if(t===target) return;
-    if(target&&target!=="dock"){railEls[target].classList.remove("hot");cellEls[target].classList.remove("hot");}
+    if(target&&target!=="dock") railEls[target].classList.remove("hot");
     if(target==="dock") dock.classList.remove("hot");
     target=t;
     if(target==="dock"){dock.classList.add("hot");buzz(5);}
-    else if(target){railEls[target].classList.add("hot");cellEls[target].classList.add("hot");buzz(5);}
+    else if(target){railEls[target].classList.add("hot");buzz(5);}
     if(ghost) ghost.className="card ghost"+(target&&target!=="dock"?" t-"+target:(target==="dock"?"":" t-"+tid));
   }
   function loop(){
     if(!active) return;
+    if(my<70) window.scrollBy(0,-10);
     var dt=dock.getBoundingClientRect().top+24;
-    setTarget(my>=dt&&S.queue.length?"dock":dropAt(mx,my));
+    setTarget(my>=dt&&S.queue.length?"dock":railAt(my));
     raf=requestAnimationFrame(loop);
   }
   function finish(drop){
     on=false;cancelAnimationFrame(raf);
-    var t=target;setTarget(null);showBoard(false);
+    var t=target;setTarget(null);
     node.classList.remove("lifted");
     if(ghost){ghost.remove();ghost=null;}
     if(!active) return;
@@ -641,7 +624,7 @@ function miniDrag(node,i,tid){
     var dx=e.clientX-x0,dy=e.clientY-y0;my=e.clientY;mx=e.clientX;
     if(!active){
       if(Math.abs(dx)+Math.abs(dy)<5) return;
-      active=true;node.classList.add("lifted");showBoard(true);
+      active=true;node.classList.add("lifted");
       ghost=el("div","card ghost t-"+tid);
       ghost.appendChild(artFor(i));ghost.appendChild(el("div","hd","@"+HANDLES[i]));
       document.body.appendChild(ghost);
