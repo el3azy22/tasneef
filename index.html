@@ -238,7 +238,7 @@ h1{margin:0;font-family:var(--display);font-size:clamp(15px,5.6vw,24px);font-wei
 .deck.demo .hd{direction:rtl}
 .steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;width:100%;max-width:340px}
 .steps li{display:flex;align-items:center;gap:10px;font-size:14px;line-height:1.5;background:var(--navy-2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
-.steps li i{flex:none;width:26px;height:26px;border-radius:50%;background:var(--foil);color:#071D2B;font-style:normal;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
+.steps li i{flex:none;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#FFFFFF 0%,#D6E7F8 45%,#FFFFFF 70%,#C9DFF5 100%);box-shadow:0 0 10px rgba(170,225,255,.7);color:#071D2B;font-style:normal;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
 .plist{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;width:100%;max-width:420px}
 .plist .btn{unicode-bidi:plaintext;text-align:center;font-size:12px;font-weight:500;min-height:44px;padding:0 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
 
@@ -306,7 +306,7 @@ h1{margin:0;font-family:var(--display);font-size:clamp(15px,5.6vw,24px);font-wei
         اختار كرت
       </button>
       <button class="btn chip pub" id="pubNow" type="button" hidden><span>اعتمد وانشر</span></button>
-      <button class="btn chip" id="helpBtn" type="button">طريقة اللعب</button>
+      <button class="btn chip" id="helpBtn" type="button">كيف اختار</button>
       <button class="btn chip" id="resetBtn" type="button">ابدأ من جديد</button>
     </div>
   </section>
@@ -326,7 +326,7 @@ h1{margin:0;font-family:var(--display);font-size:clamp(15px,5.6vw,24px);font-wei
     <li><i>2</i><span>غيّرت رأيك؟ اسحب الكرت من تصنيفه إلى تصنيف ثاني، أو رجّعه للرزمة.</span></li>
     <li><i>3</i><span>انشر تصنيفك في أي وقت من زر «اعتمد وانشر» تحت الكروت، حتى لو ما كملت الـ69.</span></li>
   </ol>
-  <button class="btn gold big" id="startBtn" type="button">ابدأ التصنيف</button>
+  <button class="btn pub big" id="startBtn" type="button"><span id="startLbl">ابدأ التصنيف</span></button>
   <a class="maker" href="https://x.com/el3azy22" target="_blank" rel="noopener">
     <img class="mk" src="maker.jpg" alt="" width="64" height="64" onerror="this.style.display='none'">
     <span><small>إنشاء الصفحة</small><b>العازي <bdi dir="ltr">@el3azy22</bdi></b></span>
@@ -526,7 +526,7 @@ $("startBtn").addEventListener("click",function(){
   try{localStorage.setItem(SEEN,"1")}catch(e){}
   closeSheet($("intro"));deal();
 });
-$("helpBtn").addEventListener("click",function(){$("startBtn").textContent="أكمل التصنيف";openSheet($("intro"),$("startBtn"));});
+$("helpBtn").addEventListener("click",function(){$("startLbl").textContent="أكمل التصنيف";openSheet($("intro"),$("startBtn"));});
 $("pickBtn").addEventListener("click",function(){
   var list=$("plist");list.textContent="";
   S.queue.slice().sort(function(a,b){return HANDLES[a].replace(/^_+/,"").toLowerCase()<HANDLES[b].replace(/^_+/,"").toLowerCase()?-1:1})
