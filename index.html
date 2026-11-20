@@ -166,8 +166,9 @@ h1{margin:0;font-family:var(--display);font-size:clamp(15px,5.6vw,24px);font-wei
     linear-gradient(to bottom,transparent 49.3%,rgba(215,180,101,.26) 49.3% 50.7%,transparent 50.7%),
     repeating-linear-gradient(var(--ang),rgba(215,180,101,.10) 0 2px,transparent 2px 9px),
     #071D2B}
+.card .art:not(:has(b)){background:none;border-color:transparent}
 .card .art b{font-family:var(--latin);font-weight:900;line-height:1;background:linear-gradient(160deg,#FBEFC8,#D7B465 55%,#B8923F);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 0 rgba(0,0,0,.45))}
-.card .art img{height:88%;width:auto;aspect-ratio:1;border-radius:50%;object-fit:cover;border:1.5px solid var(--gold);display:block}
+.card .art img{height:96%;width:auto;aspect-ratio:1;border-radius:50%;object-fit:cover;border:1.5px solid var(--gold);display:block}
 .card .hd{direction:ltr;text-align:center;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card .gem{width:9px;height:9px;transform:rotate(45deg);border-radius:2px;background:var(--ink);opacity:.8;flex:none}
 
@@ -736,11 +737,11 @@ function drawShot(withImg){
       c.fillStyle=cg;rr(c,x,yy,MW,MH,11);c.fill();
       c.strokeStyle="rgba(255,255,255,.6)";c.lineWidth=1.5;rr(c,x,yy,MW,MH,11);c.stroke();
       var ax=x+4,ay=yy+4,aw=MW-8,ah=MH-8-20;
-      c.fillStyle="#071D2B";rr(c,ax,ay,aw,ah,8);c.fill();
       var im=withImg?chipImg(h):null,ccx=ax+aw/2,ccy=ay+ah/2,rad=Math.min(aw,ah)/2-1;
       if(im){c.save();c.beginPath();c.arc(ccx,ccy,rad,0,Math.PI*2);c.clip();c.drawImage(im,ccx-rad,ccy-rad,rad*2,rad*2);c.restore();
         c.strokeStyle="#D7B465";c.lineWidth=1.5;c.beginPath();c.arc(ccx,ccy,rad,0,Math.PI*2);c.stroke();}
-      else{c.save();c.textAlign="center";c.textBaseline="middle";c.direction="ltr";c.font="900 34px "+lat;c.fillStyle="#D7B465";c.fillText(mono(h),ccx,ccy+2);c.restore();}
+      else{c.fillStyle="#071D2B";rr(c,ax,ay,aw,ah,8);c.fill();
+        c.save();c.textAlign="center";c.textBaseline="middle";c.direction="ltr";c.font="900 34px "+lat;c.fillStyle="#D7B465";c.fillText(mono(h),ccx,ccy+2);c.restore();}
       c.save();c.direction="ltr";c.textAlign="center";c.textBaseline="alphabetic";c.font="700 13px "+font;c.fillStyle=t.ink;
       c.fillText(fit(c,h,MW-6),x+MW/2,yy+MH-7);c.restore();
     });
