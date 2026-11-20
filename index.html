@@ -103,7 +103,9 @@ h1{margin:0;font-family:var(--display);font-size:clamp(15px,5.6vw,24px);font-wei
 @keyframes pubglow{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0),0 0 10px rgba(255,255,255,.35)}50%{box-shadow:0 0 0 5px rgba(255,255,255,.2),0 0 24px rgba(170,225,255,.9)}}
 .btn.big{font-family:var(--display);min-height:54px;font-size:18px;padding:0 26px;border-radius:16px}
 .btn.sq{flex-direction:column;gap:4px;width:74px;min-height:74px;padding:0;border-radius:18px;font-size:12px}
-.btn.chip{min-height:44px;font-size:12px;font-weight:500;border-radius:99px;padding:0 14px}
+.btn.chip{min-height:44px;font-size:12px;font-weight:500;border-radius:99px;padding:0 10px;white-space:nowrap}
+.btn.chip.pub{font-weight:800}
+.tools{gap:6px !important}
 .btn.warn{border-color:#E2743A;color:#F9B182}
 
 /* tier colours */
@@ -307,6 +309,7 @@ h1{margin:0;font-family:var(--display);font-size:clamp(15px,5.6vw,24px);font-wei
         <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg>
         اختار كرت
       </button>
+      <button class="btn chip pub" id="pubNow" type="button" hidden><span>اعتمد وانشر</span></button>
       <button class="btn chip" id="helpBtn" type="button">طريقة اللعب</button>
       <button class="btn chip" id="resetBtn" type="button">ابدأ من جديد</button>
     </div>
@@ -325,7 +328,7 @@ h1{margin:0;font-family:var(--display);font-size:clamp(15px,5.6vw,24px);font-wei
   <ol class="steps">
     <li><i>1</i><span>اسحب الكرت لفوق واختار تصنيف كل مغرد.</span></li>
     <li><i>2</i><span>غيّرت رأيك؟ اسحب الكرت من تصنيفه إلى تصنيف ثاني، أو رجّعه للرزمة.</span></li>
-    <li><i>3</i><span>بعد ما تخلص انشر تصنيفك عن طريق زر «انشر تصنيفك» في الأعلى.</span></li>
+    <li><i>3</i><span>انشر تصنيفك في أي وقت من زر «انشر تصنيفك»، حتى لو ما كملت الـ69.</span></li>
   </ol>
   <button class="btn gold big" id="startBtn" type="button">ابدأ التصنيف</button>
   <a class="maker" href="https://x.com/el3azy22" target="_blank" rel="noopener">
@@ -466,6 +469,7 @@ function render(popIndex){
   $("left").textContent=S.queue.length>1?("باقي "+S.queue.length+" كرت في الرزمة"):(S.queue.length===1?"آخر كرت":"");
   undoBtn.disabled=!S.log.length;
   dock.classList.toggle("finished",!S.queue.length);
+  $("pubNow").hidden=!done||!S.queue.length;
   if(!S.queue.length){$("peek1").hidden=true;$("peek2").hidden=true;}
   if(S.queue.length){
     fillCard(live,S.queue[0]);
@@ -770,6 +774,7 @@ function drawShot(withImg){
 var sheet=$("sheet"),shotImg=$("shotImg"),saveBtn=$("saveBtn"),sheetMsg=$("sheetMsg"),shotBlob=null,shotUrl=null,dl=null;
 var SAVE_TIP="احفظ الصورة أولاً بضغطة طويلة عليها، ثم اضغط «انشرها في X». بتلقى التغريدة مكتوبة، وأرفق معها الصورة.";
 function openShot(){
+  if(S.queue.length===TOTAL){hint.textContent="صنّف مغرد واحد على الأقل قبل النشر.";return;}
   var go=function(){
     var cv,fail=function(){hint.textContent="تعذّر تجهيز الصورة، حاول مرة ثانية.";};
     var done=function(b){
@@ -789,6 +794,7 @@ function openShot(){
 }
 $("shotBtn").addEventListener("click",openShot);
 $("doneBtn").addEventListener("click",openShot);
+$("pubNow").addEventListener("click",openShot);
 $("closeBtn").addEventListener("click",function(){closeSheet(sheet)});
 function tweetText(){
   return "تصنيفي لمغردين الكرة الإماراتية 🇦🇪⚽️\n\nوأنت، شو تصنيفك؟ صنّفهم من هنا 👇\n"+PAGE_URL;
